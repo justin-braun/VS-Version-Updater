@@ -42,8 +42,8 @@ runs:
 
           # Set new version
           $fversionNode.InnerText = $newversion
-          $version = $newversion
+          #$version = $newversion
 
           $xml.Save("${{ inputs.csproj-file }}") | Out-Null
 
-          Write-Output "::set-output name=version::$version"
+          Write-Output "::set-output name=version::$newversion"
