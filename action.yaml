@@ -24,7 +24,7 @@ runs:
       id: version_increment
       shell: pwsh
       run: |         
-          [xml]$xml = Get-Content ${{ inputs.csproj-file }}
+          [xml]$xml = Get-Content "${{ inputs.csproj-file }}""
 
           $fversion = ""
           
