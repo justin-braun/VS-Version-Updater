@@ -1,1 +1,46 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-action.json
+name: 'Increment .csproj Version'
+description: 'Increments the csproj minor or build version'
+branding:
+  icon: copy
+  color: blue
+inputs:
+  version-type:
+    description: 'Version type - build or minor'
+    required: true
+    default: 'build'
+  csproj-file:
+    description: 'Path to .csproj manifest'
+    required: true
+outputs:
+  version-number:
+    description: 'The new version number'
+    value: ${{ steps.version_increment.outputs.version }}
+runs:
+  using: "composite"
+  steps:
+    - name: Increment csproj version
+      id: version_increment
+      shell: pwsh
+      run: |         
+          [xml]$xml = Get-Content ${{ inputs.csproj-file }}
 
+          $fversion = ""
+          
+          if($xml.SelectSingleNode("//Project/PropertyGroup/FileVersion")) {
+            $fversion = $xml.SelectSingleNode("//Project/PropertyGroup/FileVersion").InnerText
+          }
+          else {
+            # Create new node for FileVersion
+          }
+
+          # Increment version
+          $newversion = New-Object Version ([int]$fversion.Major),([int]$fversion.Minor),([int]$fversion.Build + 1)
+
+          # Set new version
+          $fversion.InnerText = $newversion
+          $version = $newversion
+
+          $xml.Save(${{ inputs.csproj-file }}) | Out-Null
+
+          Write-Output "::set-output name=version::$version"
