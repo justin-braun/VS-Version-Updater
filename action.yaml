@@ -27,6 +27,7 @@ runs:
           [xml]$xml = Get-Content "${{ inputs.csproj-file }}"
 
           $fversion = ""
+          Write-Output $xml
           
           if($xml.SelectSingleNode("//Project/PropertyGroup/FileVersion")) {
             $fversion = $xml.SelectSingleNode("//Project/PropertyGroup/FileVersion").InnerText
