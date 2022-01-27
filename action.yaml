@@ -1,4 +1,5 @@
 # yaml-language-server: $schema=https://json.schemastore.org/github-action.json
+
 name: 'Increment .csproj Version'
 description: 'Increments the csproj minor or build version'
 branding:
@@ -41,6 +42,6 @@ runs:
           $fversion.InnerText = $newversion
           $version = $newversion
 
-          $xml.Save(${{ inputs.csproj-file }}) | Out-Null
+          $xml.Save("${{ inputs.csproj-file }}") | Out-Null
 
           Write-Output "::set-output name=version::$version"
