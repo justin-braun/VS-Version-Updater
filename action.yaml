@@ -28,10 +28,10 @@ runs:
 
           $fversion = ""
           $test = Get-Content ${{ inputs.csproj-file }}
-          Write-Output "XML: $test"
 
           if($xml.SelectSingleNode("//Project/PropertyGroup/FileVersion")) {
-            $fversion = $xml.SelectSingleNode("//Project/PropertyGroup/FileVersion").InnerText
+            $fversionNode = $xml.SelectSingleNode("//Project/PropertyGroup/FileVersion")
+            [version]$fversion = $fversionNode.InnerText
           }
           else {
             # Create new node for FileVersion
@@ -41,7 +41,7 @@ runs:
           $newversion = New-Object Version ([int]$fversion.Major),([int]$fversion.Minor),([int]$fversion.Build + 1)
 
           # Set new version
-          $fversion.InnerText = $newversion
+          $fversionNode.InnerText = $newversion
           $version = $newversion
 
           $xml.Save("${{ inputs.csproj-file }}") | Out-Null
