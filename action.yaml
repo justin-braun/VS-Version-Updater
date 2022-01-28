@@ -27,23 +27,37 @@ runs:
           [xml]$xml = Get-Content "${{ inputs.csproj-file }}"
 
           $fversion = ""
+          $fversionNode = ""
+          $VersionNew = $false
           $test = Get-Content ${{ inputs.csproj-file }}
 
           if($xml.SelectSingleNode("//Project/PropertyGroup/FileVersion")) {
             $fversionNode = $xml.SelectSingleNode("//Project/PropertyGroup/FileVersion")
-            [version]$fversion = $fversionNode.InnerText
           }
           else {
             # Create new node for FileVersion
+            $parent = $xml.SelectSingleNode("//Project/PropertyGroup")
+            $newElement = $xml.CreateElement("FileVersion")
+            $newElement.InnerText = "1.0.0"
+            $parent.AppendChild($newElement)
+            $fversionNode = $xml.SelectSingleNode("//Project/PropertyGroup/FileVersion")
+            $VersionNew = $true
           }
 
-          # Increment version
-          $newversion = New-Object Version ([int]$fversion.Major),([int]$fversion.Minor),([int]$fversion.Build + 1)
+          [Version]$fversion = $fversionNode.InnerText
+
+          if ($versionNew -eq $false) {
+            Switch("${{ version-type }}")
+            {
+              case "build" { $newversion = New-Object Version ([int]$fversion.Major),([int]$fversion.Minor),([int]$fversion.Build + 1) }
+              case "minor" { $newversion = New-Object Version ([int]$fversion.Major),([int]$fversion.Minor + 1),([int]0) }
+            }
+          }
 
           # Set new version
           $fversionNode.InnerText = $newversion
-          #$version = $newversion
 
+          # Save csproj xml file
           $xml.Save("${{ inputs.csproj-file }}") | Out-Null
 
           Write-Output "::set-output name=version::$newversion"
