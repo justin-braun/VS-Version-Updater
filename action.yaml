@@ -31,6 +31,7 @@ runs:
           $VersionNew = $false
           $test = Get-Content ${{ inputs.csproj-file }}
 
+          # Handle File Version
           if($xml.SelectSingleNode("//Project/PropertyGroup/FileVersion")) {
             $fversionNode = $xml.SelectSingleNode("//Project/PropertyGroup/FileVersion")
           }
@@ -46,6 +47,34 @@ runs:
 
           [Version]$fversion = $fversionNode.InnerText
 
+          # Set Assembly Version
+          if($xml.SelectSingleNode("//Project/PropertyGroup/AssemblyVersion")) {
+            $aversionNode = $xml.SelectSingleNode("//Project/PropertyGroup/AssemblyVersion")
+          }
+          else {
+            # Create new node for FileVersion
+            $parent = $xml.SelectSingleNode("//Project/PropertyGroup")
+            $newElement = $xml.CreateElement("AssemblyVersion")
+            $newElement.InnerText = "1.0.0"
+            $parent.AppendChild($newElement)
+            $aversionNode = $xml.SelectSingleNode("//Project/PropertyGroup/FileVersion")
+          }
+
+          # Set Version
+          if($xml.SelectSingleNode("//Project/PropertyGroup/Version")) {
+            $versionNode = $xml.SelectSingleNode("//Project/PropertyGroup/Version")
+          }
+          else {
+            # Create new node for FileVersion
+            $parent = $xml.SelectSingleNode("//Project/PropertyGroup")
+            $newElement = $xml.CreateElement("Version")
+            $newElement.InnerText = "1.0.0"
+            $parent.AppendChild($newElement)
+            $versionNode = $xml.SelectSingleNode("//Project/PropertyGroup/Version")
+          }
+
+
+
           if ($versionNew -eq $false) {
             Switch("${{ inputs.version-type }}")
             {
@@ -58,8 +87,10 @@ runs:
             $newversion = $fversion
           }
 
-          # Set new version
+          # Set new version for each attribute
           $fversionNode.InnerText = $newversion
+          $aversionNode.InnerText = $newversion
+          $versionNode.InnerText = $newversion
 
           # Save csproj xml file
           $xml.Save("${{ inputs.csproj-file }}") | Out-Null
