@@ -49,8 +49,8 @@ runs:
           if ($versionNew -eq $false) {
             Switch("${{ inputs.version-type }}")
             {
-              case "build" { $newversion = New-Object Version ([int]$fversion.Major),([int]$fversion.Minor),([int]$fversion.Build + 1) }
-              case "minor" { $newversion = New-Object Version ([int]$fversion.Major),([int]$fversion.Minor + 1),([int]0) }
+              "build" { $newversion = New-Object Version ([int]$fversion.Major),([int]$fversion.Minor),([int]$fversion.Build + 1) }
+              "minor" { $newversion = New-Object Version ([int]$fversion.Major),([int]$fversion.Minor + 1),([int]0) }
               default { $newversion = $fversion }
             }
           }
