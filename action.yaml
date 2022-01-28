@@ -54,6 +54,9 @@ runs:
               default { $newversion = $fversion }
             }
           }
+          else {
+            $newversion = $fversion
+          }
 
           # Set new version
           $fversionNode.InnerText = $newversion
