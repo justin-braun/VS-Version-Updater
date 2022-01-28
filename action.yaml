@@ -47,7 +47,7 @@ runs:
           [Version]$fversion = $fversionNode.InnerText
 
           if ($versionNew -eq $false) {
-            Switch("${{ version-type }}")
+            Switch("${{ inputs.version-type }}")
             {
               case "build" { $newversion = New-Object Version ([int]$fversion.Major),([int]$fversion.Minor),([int]$fversion.Build + 1) }
               case "minor" { $newversion = New-Object Version ([int]$fversion.Major),([int]$fversion.Minor + 1),([int]0) }
